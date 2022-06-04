@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -99,6 +100,9 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 		return err
 	}
 
+	req.Header.Add("Accept", `application/json`)
+	req.Header.Add("Content-Type", `application/json`)
+
 	// set query params
 	setQuery(req.URL, reqPars)
 
@@ -108,6 +112,8 @@ func (s *AuthSession) Do(result interface{}, method, ver, path string, reqPars m
 		return err
 	}
 	defer res.Body.Close()
+
+	log.Printf("[DEBUG] status code: %d", res.StatusCode)
 
 	if res.StatusCode < 200 || res.StatusCode > 226 {
 		b, err := ioutil.ReadAll(res.Body)
